@@ -4,6 +4,8 @@ object Hello {
     val columns = 7
     val matrix = Array.ofDim[String](rows, columns)
     var playing = true
+    var xMoves: Array[Int] = Array()
+    var oMoves: Array[Int] = Array()
 
     def initMatrix() = {
       for (r <- 0 to rows - 1) {
@@ -19,6 +21,19 @@ object Hello {
           if (c == 6) print(matrix(r)(c) + "\n") else print(matrix(r)(c))
         }
       }
+      println("\n")
+    }
+
+    def printMoves(): Unit = {
+      print("X: ")
+      for (x <- xMoves) {
+        print(s"${x}, ")
+      }
+      print("\n" + "O: ")
+      for (o <- oMoves) {
+        print(s"${o}, ")
+      }
+      println("\n")
     }
 
     def pushToMatrix(col: Int, player: String) = {
@@ -28,6 +43,8 @@ object Hello {
           if (matrix(r)(col - 1) == "_" && !done) {
             matrix(r)(col - 1) = player
             done = true
+            if (player == "X") xMoves = xMoves :+ col
+            else oMoves = oMoves :+ col
           }
         }
       }
@@ -102,9 +119,11 @@ object Hello {
     var activePlayer = "X"
 
     while (playing) {
-      val userColumn = scala.io.StdIn.readLine()
-      pushToMatrix(userColumn.toIntOption.getOrElse(-1), activePlayer)
+      if (activePlayer == "X") println("X's move") else println("O's move")
+      val playerColumn = scala.io.StdIn.readLine()
+      pushToMatrix(playerColumn.toIntOption.getOrElse(-1), activePlayer)
       printMatrix()
+      printMoves()
       checkForWinner(activePlayer)
       activePlayer = if (activePlayer == "X") "O" else "X"
     }
