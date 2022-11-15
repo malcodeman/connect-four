@@ -7,6 +7,7 @@ object ConnectFour {
     var xMoves: Array[Int] = Array()
     var oMoves: Array[Int] = Array()
     var activePlayer = "X"
+    var movesCounter = 0
 
     def initMatrix() = {
       for (r <- 0 to rows - 1) {
@@ -44,6 +45,7 @@ object ConnectFour {
           if (matrix(r)(col - 1) == "_" && !pushed) {
             matrix(r)(col - 1) = player
             pushed = true
+            movesCounter = movesCounter + 1
             if (player == "X") xMoves = xMoves :+ col
             else oMoves = oMoves :+ col
           }
@@ -67,7 +69,12 @@ object ConnectFour {
       checkForPlayAgain()
     }
 
-    def checkForDraw() = {}
+    def checkForDraw() = {
+      if (movesCounter == rows * columns) {
+        println("---DRAW---")
+        checkForPlayAgain()
+      }
+    }
 
     def checkForWinner(player: String) = {
       // Horizontal
