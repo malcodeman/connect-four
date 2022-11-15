@@ -1,4 +1,4 @@
-object Hello {
+object ConnectFour {
   def main(args: Array[String]) = {
     val rows = 6
     val columns = 7
@@ -6,6 +6,7 @@ object Hello {
     var playing = true
     var xMoves: Array[Int] = Array()
     var oMoves: Array[Int] = Array()
+    var activePlayer = "X"
 
     def initMatrix() = {
       for (r <- 0 to rows - 1) {
@@ -37,12 +38,12 @@ object Hello {
     }
 
     def pushToMatrix(col: Int, player: String) = {
-      var done = false
+      var pushed = false
       for (r <- rows - 1 to 0 by -1) {
         for (c <- 0 to columns - 1) {
-          if (matrix(r)(col - 1) == "_" && !done) {
+          if (matrix(r)(col - 1) == "_" && !pushed) {
             matrix(r)(col - 1) = player
-            done = true
+            pushed = true
             if (player == "X") xMoves = xMoves :+ col
             else oMoves = oMoves :+ col
           }
@@ -50,11 +51,23 @@ object Hello {
       }
     }
 
+    def checkForPlayAgain() = {
+      println("Play again? (y/n)?")
+      val again = scala.io.StdIn.readLine()
+      if (again == "y") {
+        initMatrix()
+        xMoves = Array.emptyIntArray
+        oMoves = Array.emptyIntArray
+      } else System.exit(0)
+    }
+
     def printVictory(player: String) = {
       println("---VICTORY---")
       println("Player " + player + " won!")
-      playing = false
+      checkForPlayAgain()
     }
+
+    def checkForDraw() = {}
 
     def checkForWinner(player: String) = {
       // Horizontal
@@ -99,7 +112,7 @@ object Hello {
       }
       // Negative slope
       for (c <- 0 to columns - 4) {
-        for (r <- 0 to rows - 1) {
+        for (r <- 3 to rows - 1) {
           if (
             matrix(r)(c) == player && matrix(r - 1)(c + 1) == player && matrix(
               r - 2
@@ -113,18 +126,28 @@ object Hello {
       }
     }
 
+    def getPlayerInput(): Int = {
+      var playerColumn = scala.io.StdIn.readLine()
+      while {
+        val columnNumber = playerColumn.toIntOption.getOrElse(-1)
+        columnNumber == -1 || columnNumber < 1 || columnNumber > columns
+      }
+      do {
+        playerColumn = scala.io.StdIn.readLine()
+      }
+      return playerColumn.toIntOption.getOrElse(-1)
+    }
+
     initMatrix()
     printMatrix()
 
-    var activePlayer = "X"
-
     while (playing) {
       if (activePlayer == "X") println("X's move") else println("O's move")
-      val playerColumn = scala.io.StdIn.readLine()
-      pushToMatrix(playerColumn.toIntOption.getOrElse(-1), activePlayer)
+      pushToMatrix(getPlayerInput(), activePlayer)
       printMatrix()
       printMoves()
       checkForWinner(activePlayer)
+      checkForDraw()
       activePlayer = if (activePlayer == "X") "O" else "X"
     }
   }
